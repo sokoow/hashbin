@@ -1,4 +1,4 @@
-/* 
+/*
   Module dependencies:
 
   - Express
@@ -9,8 +9,8 @@
 
   It is a common practice to name the variables after the module name.
   Ex: http is the "http" module, express is the "express" module, etc.
-  The only exception is Underscore, where we use, conveniently, an 
-  underscore. Oh, and "socket.io" is simply called io. Seriously, the 
+  The only exception is Underscore, where we use, conveniently, an
+  underscore. Oh, and "socket.io" is simply called io. Seriously, the
   rest should be named after its module name.
 
 */
@@ -24,13 +24,13 @@ var express = require("express")
   , io = require("socket.io").listen(http)
   , _ = require("underscore");
 
-	
+
 /* Server config */
 
 //Server's IP address
 app.set("ipaddr", "127.0.0.1");
 
-//Server's port number 
+//Server's port number
 app.set("port", port);
 
 //Specify the views folder
@@ -65,35 +65,47 @@ app.get("/:hashid", function(request, response) {
 
 // Handle incoming requests to server
 io.sockets.on('connection', function(socket){
-	
+
 	// Subscribe client to room
-    socket.on('subscribe', function(room, sessionid) { 
+    socket.on('subscribe', function(room, sessionid) {
         console.log('User '+sessionid+' is joining room ' + room);
-        socket.join(room); 
+        socket.join(room);
     })
-	
+
 	// Unsubscribe client from room
-	socket.on('unsubscribe', function(room, sessionid) {  
+	socket.on('unsubscribe', function(room, sessionid) {
 		console.log('User '+sessionid+' is leaving room' + room);
-		socket.leave(room); 
+		socket.leave(room);
 	})
-	
+
 	// Request the paste content from the peers in the room
 	socket.on('content_request', function(data) {
 		console.log('User '+data.sessionid+' is sending a get_content request to '+data.room);
 		socket.broadcast.to(data.room).emit('get_content', data);
 	});
-	
+
 	// The peers have responded and need to send the request back to the requesters
 	socket.on('content_response', function(data) {
 		console.log('User '+data.peerid+' is sending content to '+data.sessionid+' @ '+data.room);
 		socket.broadcast.to(data.room).emit('got_content', data);
 	});
 
-	
+
 });
 
 //Start the http server at port and IP defined before
 http.listen(app.get("port"), function() {
   console.log("Server up and running. Go to http://" + app.get("ipaddr") + ":" + app.get("port"));
 });
+
+const http = require('http');
+const express = require('express');
+const app = express();
+app.get("/", (request, response) => {
+  console.log(Date.now() + " Ping Received");
+  response.sendStatus(200);
+});
+app.listen(process.env.PORT);
+setInterval(() => {
+  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
