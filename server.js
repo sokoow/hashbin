@@ -51,7 +51,6 @@ app.use(bodyParser.json());
 
 //Handle route "GET /", as in "http://localhost:8080/"
 app.get("/", function(request, response) {
-
   //Render the view called "index"
   response.render("index.html");
 
@@ -98,12 +97,6 @@ http.listen(app.get("port"), function() {
   console.log("Server up and running. Go to http://" + app.get("ipaddr") + ":" + app.get("port"));
 });
 
-app.get("/", (request, response) => {
-  console.log(Date.now() + " Ping Received");
-  response.sendStatus(200);
-});
-
-app.listen(process.env.PORT);
 setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 280000);
